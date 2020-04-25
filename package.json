@@ -1,0 +1,27 @@
+{
+  "name": "koa-rest-api",
+  "version": "1.0.0",
+  "description": "a rest api project",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hengwujun128/koa-rest-api.git"
+  },
+  "author": "hengwujun128@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hengwujun128/koa-rest-api/issues"
+  },
+  "homepage": "https://github.com/hengwujun128/koa-rest-api#readme",
+  "dependencies": {
+    "koa": "^2.11.0",
+    "koa-router": "^8.0.8"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
+}
