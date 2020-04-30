@@ -1,23 +1,10 @@
 // const jsonwebtoken = require('jsonwebtoken') 自己编写中间件需要借助此 jsonwebtoken
 const jwt = require('koa-jwt') // 就不需要 jsonwebtoken
 const Router = require('koa-router')
-const router = new Router({ prefix: '/users' })
+const router = new Router({ prefix: '/topics' })
 const { secret } = require('../config')
 
-const {
-  find,
-  findById,
-  create,
-  update,
-  delete: del,
-  login,
-  checkOwner,
-  listFollowing,
-  listFollowers,
-  follow,
-  unfollow,
-  checkUserExist,
-} = require('../controllers/users')
+const { find, findById, create, update } = require('../controllers/topics')
 /* 
 authentication middleware:自己定义的中间件
 1. 获取客户端 token
@@ -40,22 +27,16 @@ const auth = async (context, next) => {
   await next()
 }
 
-/* 
+/*
 使用 jwt 中间 替换自定义 auth 中间件
  */
 
 const Auth2 = jwt({ secret })
 
 router.get('/', find)
-router.post('/', create)
-router.delete('/:id', Auth2, checkOwner, del)
-router.patch('/:id', Auth2, checkOwner, update) // part update
+router.post('/', Auth2, create)
 router.get('/:id', findById)
-router.post('/login', login)
-router.get('/:id/following', listFollowing) // 某个用户关注,是个嵌套关系,id 是必须的
-router.get('/:id/listFollowers', listFollowers) // 某个用户的粉丝列表
-// 关注和取消关注的接口一致
-router.put('/following/:id', Auth2, checkUserExist, follow) // 关注某人:是向当前登录用户following 属性添加 某用户id
-router.delete('/following/:id', Auth2, checkUserExist, unfollow) // 取消关注
+
+router.patch('/:id', Auth2, update) // part update
 
 module.exports = router
