@@ -1,4 +1,6 @@
 const topicModel = require('../models/topic')
+const usersModel = require('../models/users')
+const questionsModel = require('../models/questions')
 const { secret } = require('../config')
 class TopicsCtl {
   async find(context) {
@@ -25,6 +27,11 @@ class TopicsCtl {
     context.body = topic
   }
 
+  /* 列出topic 下的问题列表 */
+  async listQuestions(context) {
+    const questions = await questionsModel.find({ topics: context.params.id })
+    context.body = questions
+  }
   async create(context) {
     context.verifyParams({
       name: { type: 'string', required: true },
@@ -47,6 +54,24 @@ class TopicsCtl {
       context.request.body
     )
     context.body = topic
+  }
+  /* 
+  topic 被多少用户关注
+   */
+  async listFollowers(context) {
+    // following 是个数组:中应该包含context.params.id,这里不用写包含逻辑
+    const users = await usersModel.find({ followingTopics: context.params.id })
+    context.body = users
+  }
+  /* 判断 topic 是否存在
+   */
+
+  async checkTopicExist(context, next) {
+    const user = await topicModel.findById(context.params.id)
+    if (!user) {
+      context.throw(404, 'topic不存在')
+    }
+    await next() // 这里必须要等待下个中间件执行完毕
   }
 }
 module.exports = new TopicsCtl()

@@ -1,4 +1,6 @@
 const usersModel = require('../models/users')
+const questionModel = require('../models/questions')
+
 const jsonwebtoken = require('jsonwebtoken')
 const { secret } = require('../config')
 class UsersCtl {
@@ -167,13 +169,68 @@ class UsersCtl {
     }
     context.status = 204
   }
+  /* 
+  关注 Topic
+   */
+  async followTopic(context) {
+    const me = await usersModel
+      .findById(context.state.user._id)
+      .select('+followingTopics')
+    // following 是 mongo 自带的数据类型,这里需要批量转成字符串
 
+    if (
+      !me.followingTopics.map((id) => id.toString()).includes(context.params.id)
+    ) {
+      me.followingTopics.push(context.params.id)
+      me.save() // 注意:添加关注之后还要保存到数据库
+    }
+    context.status = 204
+  }
+
+  /* 
+  取消关注 Topic
+   */
+  async unfollowTopic(context) {
+    const me = await usersModel
+      .findById(context.state.user._id)
+      .select('+followingTopics')
+    // 获取 要取消用户的索引
+    const index = me.followingTopics
+      .map((id) => id.toString())
+      .indexOf(context.params.id)
+    if (index > -1) {
+      me.followingTopics.splice(index, 1)
+      me.save() // 注意:取消关注之后还要保存到数据库
+    }
+    context.status = 204
+  }
+  /*
+  获取用户关注的 topics
+   */
+  async listFollowingTopics(context) {
+    const user = await usersModel
+      .findById(context.params.id)
+      .select('+followingTopics')
+      .populate('followingTopics')
+    if (!user) {
+      context.throw(404, '用户不存在')
+    } else {
+      //
+      context.body = user.followingTopics
+    }
+  }
   async checkUserExist(context, next) {
     const user = await usersModel.findById(context.params.id)
     if (!user) {
       context.throw(404, '用户不存在')
     }
     await next() // 这里必须要等待下个中间件执行完毕
+  }
+  async listQuestions(context) {
+    const questions = await questionModel.find({
+      questioner: context.params.id,
+    })
+    context.body = questions
   }
 }
 module.exports = new UsersCtl()

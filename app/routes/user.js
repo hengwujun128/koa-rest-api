@@ -13,11 +13,17 @@ const {
   login,
   checkOwner,
   listFollowing,
+  listFollowingTopics,
   listFollowers,
   follow,
   unfollow,
   checkUserExist,
+  followTopic,
+  unfollowTopic,
+  listQuestions,
 } = require('../controllers/users')
+
+const { checkTopicExist } = require('../controllers/topics')
 /* 
 authentication middleware:自己定义的中间件
 1. 获取客户端 token
@@ -55,7 +61,15 @@ router.post('/login', login)
 router.get('/:id/following', listFollowing) // 某个用户关注,是个嵌套关系,id 是必须的
 router.get('/:id/listFollowers', listFollowers) // 某个用户的粉丝列表
 // 关注和取消关注的接口一致
-router.put('/following/:id', Auth2, checkUserExist, follow) // 关注某人:是向当前登录用户following 属性添加 某用户id
+router.put('/following/:id', Auth2, checkUserExist, follow) // 关注某人:是向当前登录用户following 属性
 router.delete('/following/:id', Auth2, checkUserExist, unfollow) // 取消关注
+
+// 用户关注topic和取消关注 topic
+router.put('/followingTopics/:id', Auth2, checkTopicExist, followTopic) // 关注Topic:是向当前登录用户followingTopic 属性添加 某topic id
+router.delete('/followingTopics/:id', Auth2, checkTopicExist, unfollowTopic) // 取消关注Topic
+// 用户关注的 topics 列表
+router.get('/:id/followingTopic', listFollowingTopics) // 某个用户关注,是个嵌套关系,id 是必须的
+// 用户的问题列表
+router.get('/:id/questions', listQuestions) // 某个用户的粉丝列表
 
 module.exports = router

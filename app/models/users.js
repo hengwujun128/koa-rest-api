@@ -57,6 +57,10 @@ const user = new Schema({
     type: [{ type: Schema.Types.ObjectId, ref: 'usersModel' }],
     select: false,
   },
+  followingTopics: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Topic' }],
+    select: false,
+  },
 })
 // 导出的 model 也是个类
 module.exports = model('usersModel', user)

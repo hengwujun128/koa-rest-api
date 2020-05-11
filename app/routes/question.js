@@ -1,18 +1,18 @@
 // const jsonwebtoken = require('jsonwebtoken') 自己编写中间件需要借助此 jsonwebtoken
 const jwt = require('koa-jwt') // 就不需要 jsonwebtoken
 const Router = require('koa-router')
-const router = new Router({ prefix: '/topics' })
+const router = new Router({ prefix: '/questions' })
 const { secret } = require('../config')
 
 const {
   find,
   findById,
   create,
+  delete: del,
   update,
-  checkTopicExist,
-  listFollowers,
-  listQuestions,
-} = require('../controllers/topics')
+  checkQuestionExist,
+  checkQuestioner,
+} = require('../controllers/questions')
 /* 
 authentication middleware:自己定义的中间件
 1. 获取客户端 token
@@ -43,11 +43,8 @@ const Auth2 = jwt({ secret })
 
 router.get('/', find)
 router.post('/', Auth2, create)
-router.get('/:id', checkTopicExist, findById)
+router.delete('/:id', checkQuestionExist, checkQuestioner, del) // delete
+router.patch('/:id', Auth2, checkQuestionExist, checkQuestioner, update) // part update
+router.get('/:id', checkQuestionExist, findById)
 
-router.patch('/:id', Auth2, checkTopicExist, update) // part update
-// 获取某个话题被少用户关注(话题的粉丝)
-router.get('/:id/followers', checkTopicExist, listFollowers) // part update
-// topic 下的 question 列表
-router.get('/:id/questions', checkTopicExist, listQuestions)
 module.exports = router
