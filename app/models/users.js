@@ -72,6 +72,11 @@ const user = new Schema({
     type: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
     select: false,
   },
+  // 用户搜藏答案 列表
+  collectingAnswers: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
+    select: false,
+  },
 })
 // 导出的 model 也是个类
 module.exports = model('usersModel', user)

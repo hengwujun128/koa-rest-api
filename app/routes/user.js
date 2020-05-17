@@ -18,6 +18,7 @@ const {
   follow,
   unfollow,
   checkUserExist,
+  //用户关注 topic
   followTopic,
   unfollowTopic,
   listQuestions,
@@ -29,6 +30,10 @@ const {
   disLikeAnswer,
   unDisLikeAnswer,
   listDisLinkingAnswers,
+  // 用户搜藏答案和取消收藏答案
+  collectAnswer,
+  unCollectAnswer,
+  listCollectingAnswers,
 } = require('../controllers/users')
 // 引入 topic控制器使用中间件判断 topic 是否存在
 const { checkTopicExist } = require('../controllers/topics')
@@ -104,5 +109,14 @@ router.put(
 ) /* 赞踩互斥:点赞就取消踩,点擦就取消赞 */
 router.delete('/dislinkAnswers/:id', Auth2, checkAnswerExist, unDisLikeAnswer)
 router.get('/:id/dislinkAnswers', listDisLinkingAnswers)
+/* 用户收藏和取消搜藏答案 */
+router.put('/collectingAnswers/:id', Auth2, checkAnswerExist, collectAnswer)
+router.delete(
+  '/collectingAnswers/:id',
+  Auth2,
+  checkAnswerExist,
+  unCollectAnswer
+)
+router.get('/:id/collectingAnswers', listDisLinkingAnswers)
 
 module.exports = router

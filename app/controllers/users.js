@@ -343,6 +343,66 @@ class UsersCtl {
     }
   }
   // --------------------------用户踩和取消踩逻辑 end------------------------------------
+  // --------------------------用户收藏答案和取消收藏答案列表  start----------------------------
+  /*
+   * 用户收藏答案:指当前登录用户收藏某个答案
+   * router.put('/collectingAnswers/:id', Auth2, checkAnswerExist, collectAnswer)
+   */
+  async collectAnswer(context, next) {
+    const me = await usersModel
+      .findById(context.state.user._id)
+      .select('+collectingAnswers')
+    // following 是 mongo 自带的数据类型,这里需要批量转成字符串
+    // 判断用户点赞属性列表中是否有某个答案,没有就 push 进去
+    if (
+      !me.collectingAnswers
+        .map((id) => id.toString())
+        .includes(context.params.id)
+    ) {
+      me.collectingAnswers.push(context.params.id)
+      me.save()
+    }
+    context.status = 204
+    await next()
+  }
+
+  /*
+   * 用户取消收藏答案:同样是当前登录用户取消收藏答案
+   router.delete('/collectingAnswers/:id',Auth2,checkAnswerExist,unCollectAnswer)
+   */
+  async unCollectAnswer(context) {
+    const me = await usersModel
+      .findById(context.state.user._id)
+      .select('+collectingAnswers')
+    // 获取 要取消用户的索引
+    const index = me.collectingAnswers
+      .map((id) => id.toString())
+      .indexOf(context.params.id)
+
+    if (index > -1) {
+      me.collectingAnswers.splice(index, 1)
+      me.save() // 注意:取消关注之后还要保存到数据库
+    }
+    context.status = 204
+  }
+  /*
+   * 获取用户收藏答案列表:因为是引用,想拿到具体信息,所以需要 populate一下
+   * 注意:用户搜藏答案列表是某个用户,不是当前登录用户,因此要传递用户 Id
+   * router.get('/:id/collectingAnswers', listDisLinkingAnswers)
+   */
+  async listCollectingAnswers(context) {
+    const user = await usersModel
+      .findById(context.params.id)
+      .select('+collectingAnswers')
+      .populate('collectingAnswers')
+    if (!user) {
+      context.throw(404, '用户不存在')
+    } else {
+      // 用户搜藏答案列表
+      context.body = user.collectingAnswers
+    }
+  }
+  // --------------------------用户收藏答案和取消收藏答案列表  end------------------------------
 
   async checkUserExist(context, next) {
     const user = await usersModel.findById(context.params.id)
