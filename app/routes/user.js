@@ -21,9 +21,19 @@ const {
   followTopic,
   unfollowTopic,
   listQuestions,
+  //赞
+  likeAnswer,
+  unLikeAnswer,
+  listLinkingAnswers,
+  // 踩
+  disLikeAnswer,
+  unDisLikeAnswer,
+  listDisLinkingAnswers,
 } = require('../controllers/users')
-
+// 引入 topic控制器使用中间件判断 topic 是否存在
 const { checkTopicExist } = require('../controllers/topics')
+// 引入 answers 控制器,使用中间件判断答案是否存在
+const { checkAnswerExist } = require('../controllers/answers')
 /* 
 authentication middleware:自己定义的中间件
 1. 获取客户端 token
@@ -71,5 +81,28 @@ router.delete('/followingTopics/:id', Auth2, checkTopicExist, unfollowTopic) // 
 router.get('/:id/followingTopic', listFollowingTopics) // 某个用户关注,是个嵌套关系,id 是必须的
 // 用户的问题列表
 router.get('/:id/questions', listQuestions) // 某个用户的粉丝列表
+
+/* 用户赞,取消赞,赞列表 */
+/* 赞踩互斥:点赞就取消踩,点踩就取消赞 ,likeAnswer 之前需要unDisLikeAnswer 先执行,因此是个likeAnswer是个中间件*/
+router.put(
+  '/linkAnswers/:id',
+  Auth2,
+  checkAnswerExist,
+  likeAnswer,
+  unDisLikeAnswer
+)
+router.delete('/linkAnswers/:id', Auth2, checkAnswerExist, unLikeAnswer)
+router.get('/:id/linkAnswers', listLinkingAnswers)
+
+/* 用户踩,取消踩,踩列表 */
+router.put(
+  '/dislinkAnswers/:id',
+  Auth2,
+  checkAnswerExist,
+  disLikeAnswer,
+  unLikeAnswer
+) /* 赞踩互斥:点赞就取消踩,点擦就取消赞 */
+router.delete('/dislinkAnswers/:id', Auth2, checkAnswerExist, unDisLikeAnswer)
+router.get('/:id/dislinkAnswers', listDisLinkingAnswers)
 
 module.exports = router

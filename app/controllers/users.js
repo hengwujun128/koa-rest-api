@@ -1,5 +1,7 @@
 const usersModel = require('../models/users')
 const questionModel = require('../models/questions')
+// 引入答案模型: 因为在点赞和取消时候,需要更新答案模型的投票数
+const answerModel = require('../models/answers')
 
 const jsonwebtoken = require('jsonwebtoken')
 const { secret } = require('../config')
@@ -169,6 +171,8 @@ class UsersCtl {
     }
     context.status = 204
   }
+
+  // ---------------------------用户关注 Topic和取消 Topic start----------------------
   /* 
   关注 Topic
    */
@@ -219,6 +223,127 @@ class UsersCtl {
       context.body = user.followingTopics
     }
   }
+  // ---------------------------用户关注 Topic和取消 Topic end------------------------
+  // --------------------------用户点赞和取消点赞逻辑 start----------------------------------
+  /*
+   * 用户点赞:点赞之后还要修改答案的投票数
+   */
+  async likeAnswer(context, next) {
+    const me = await usersModel
+      .findById(context.state.user._id)
+      .select('+likingAnswers')
+    // following 是 mongo 自带的数据类型,这里需要批量转成字符串
+    // 判断用户点赞属性列表中是否有某个答案,没有就 push 进去
+    if (
+      !me.likingAnswers.map((id) => id.toString()).includes(context.params.id)
+    ) {
+      me.likingAnswers.push(context.params.id)
+      me.save() // 注意:添加点赞 之后还要保存到数据库
+      // 修改答案的投票数+1,mongoose 中为某个属性值+-1,increment
+      await answerModel.findByIdAndUpdate(context.params.id, {
+        $inc: { voteCount: 1 },
+      })
+    }
+    context.status = 204
+    await next()
+  }
+
+  /*
+   * 用户取消点赞:首先也是获取用户的点赞列表
+   */
+  async unLikeAnswer(context) {
+    const me = await usersModel
+      .findById(context.state.user._id)
+      .select('+likingAnswers')
+    // 获取 要取消用户的索引
+    const index = me.likingAnswers
+      .map((id) => id.toString())
+      .indexOf(context.params.id)
+
+    if (index > -1) {
+      me.likingAnswers.splice(index, 1)
+      me.save() // 注意:取消关注之后还要保存到数据库
+      // 更新某个答案的点赞数
+      await answerModel.findByIdAndUpdate(context.params.id, {
+        $inc: { voteCount: -1 },
+      })
+    }
+    context.status = 204
+  }
+  /*
+   * 获取用户点赞列表:因为是引用,想拿到具体信息,所以需要 populate一下
+   */
+  async listLinkingAnswers(context) {
+    const user = await usersModel
+      .findById(context.params.id)
+      .select('+likingAnswers')
+      .populate('likingAnswers')
+    if (!user) {
+      context.throw(404, '用户不存在')
+    } else {
+      // 用户点赞列表
+      context.body = user.likingAnswers
+    }
+  }
+  // --------------------------用户点赞和取消点赞逻辑 end------------------------------------
+
+  // --------------------------用户踩和取消踩逻辑 start----------------------------------
+  /*
+   * 用户踩:
+   */
+  async disLikeAnswer(context, next) {
+    const me = await usersModel
+      .findById(context.state.user._id)
+      .select('+disLikingAnswers')
+    // following 是 mongo 自带的数据类型,这里需要批量转成字符串
+    // 判断用户点赞属性列表中是否有某个答案,没有就 push 进去
+    if (
+      !me.disLikingAnswers
+        .map((id) => id.toString())
+        .includes(context.params.id)
+    ) {
+      me.disLikingAnswers.push(context.params.id)
+      me.save() // 注意:添加点赞 之后还要保存到数据库
+    }
+    context.status = 204
+    await next()
+  }
+
+  /*
+   * 用户取消点踩:首先也是获取用户的踩列表
+   */
+  async unDisLikeAnswer(context) {
+    const me = await usersModel
+      .findById(context.state.user._id)
+      .select('+disLikingAnswers')
+    // 获取 要取消用户的索引
+    const index = me.disLikingAnswers
+      .map((id) => id.toString())
+      .indexOf(context.params.id)
+
+    if (index > -1) {
+      me.disLikingAnswers.splice(index, 1)
+      me.save() // 注意:取消关注之后还要保存到数据库
+    }
+    context.status = 204
+  }
+  /*
+   * 获取用户踩列表:因为是引用,想拿到具体信息,所以需要 populate一下
+   */
+  async listDisLinkingAnswers(context) {
+    const user = await usersModel
+      .findById(context.params.id)
+      .select('+disLikingAnswers')
+      .populate('disLikingAnswers')
+    if (!user) {
+      context.throw(404, '用户不存在')
+    } else {
+      // 用户踩列表
+      context.body = user.disLikingAnswers
+    }
+  }
+  // --------------------------用户踩和取消踩逻辑 end------------------------------------
+
   async checkUserExist(context, next) {
     const user = await usersModel.findById(context.params.id)
     if (!user) {

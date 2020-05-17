@@ -23,6 +23,12 @@ const answerSchema = new Schema({
     type: String,
     required: true,
   },
+  // 一个答案的投票数(点赞数)
+  voteCount: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
 })
 // 导出的 model 也是个类
 module.exports = model('Answer', answerSchema)
