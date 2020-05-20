@@ -15,7 +15,7 @@ const {
   update,
   checkCommentExist,
   checkCommentator,
-} = require('../controllers/answers')
+} = require('../controllers/comments')
 /* 
 authentication middleware:自己定义的中间件
 1. 获取客户端 token
@@ -47,7 +47,7 @@ const Auth2 = jwt({ secret })
 router.get('/', find)
 router.post('/', Auth2, create)
 router.delete('/:id', checkCommentExist, checkCommentator, del) // delete
-router.patch('/:id', Auth2, checkAnswerExist, checkCommentator, update) // part update
+router.patch('/:id', Auth2, checkCommentExist, checkCommentator, update) // part update
 router.get('/:id', checkCommentExist, findById)
 
 module.exports = router

@@ -9,12 +9,15 @@ const mongoose = require('mongoose')
 
 const { Schema, model } = mongoose // Scheme 是个类
 
-const topic = new Schema({
-  //select:false,是为了查询的时候不显示该字段
-  __v: { type: Number, select: false },
-  name: { type: String, required: true },
-  avatar_url: { type: String },
-  introduction: { type: String, select: false },
-})
+const topic = new Schema(
+  {
+    //select:false,是为了查询的时候不显示该字段
+    __v: { type: Number, select: false },
+    name: { type: String, required: true },
+    avatar_url: { type: String },
+    introduction: { type: String, select: false },
+  },
+  { timestamps: true }
+)
 // 导出的 model 也是个类
 module.exports = model('Topic', topic)
