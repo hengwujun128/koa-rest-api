@@ -58,7 +58,7 @@ class QuestionsCtl {
     context.body = context.state.question
   }
   async checkQuestioner(context, next) {
-    const { question } = context.state.question
+    const { question } = context.state
     if (question.questioner.toString() !== context.state.user._id) {
       context.throw(403, '没有权限')
     }

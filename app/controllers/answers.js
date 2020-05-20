@@ -62,7 +62,7 @@ class AnswersCtl {
   }
   /* 检查回答者:主要是用在更改和删除,当前登录人不是回答者的没有权利  */
   async checkAnswerer(context, next) {
-    const { Answer } = context.state.Answer
+    const { Answer } = context.state
     if (Answer.Answerer.toString() !== context.state.user._id) {
       context.throw(403, '没有权限')
     }
