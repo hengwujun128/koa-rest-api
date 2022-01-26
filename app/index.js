@@ -15,20 +15,21 @@ const path = require('path')
 const koaStatic = require('koa-static')
 const Error = require('koa-json-error')
 
-const mongoose = require('mongoose')
-const { connectionStr } = require('./config')
-mongoose.connect(
-  connectionStr,
-  {
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  },
-  () => {
-    console.log('connect  mongoDb succeed')
-  }
-)
-mongoose.connection.on('error', console.error)
+// const mongoose = require('mongoose')
+// const { connectionStr } = require('./config')
+// mongoose.connect(
+//   connectionStr,
+//   {
+//     connectTimeoutMS: 2000,
+//     useNewUrlParser: true,
+//     useFindAndModify: false,
+//     useUnifiedTopology: true,
+//   },
+//   () => {
+//     console.log('connect  mongoDb succeed')
+//   }
+// )
+// mongoose.connection.on('error', console.error)
 
 //任何中间件都需要用 use 方法,注册到 APP 之中
 

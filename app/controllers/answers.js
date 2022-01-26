@@ -44,9 +44,9 @@ class AnswersCtl {
     context.body = Answer
   }
   /* update Answer 
-   1. 这里有个优化点:更新时候使用了 findById 查询了 modal
-   2. update 依赖上个中间件 findById,可以使用中间件中结果进行判断,不需要 findByIdAndUpdate()
-   3. 答案的更新 只能是回答的人才能更新
+  1. 这里有个优化点:更新时候使用了 findById 查询了 modal
+  2. update 依赖上个中间件 findById,可以使用中间件中结果进行判断,不需要 findByIdAndUpdate()
+  3. 答案的更新 只能是回答的人才能更新
   */
   async update(context) {
     context.verifyParams({

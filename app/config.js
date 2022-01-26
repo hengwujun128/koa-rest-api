@@ -1,4 +1,5 @@
 module.exports = {
-  connectionStr: 'mongodb://139.199.203.32:27017/koa-rest-api',
-  secret: '123456',
+  // connectionStr: 'mongodb://175.178.75.67:27017/koa-rest-api',
+  connectionStr: 'mongodb://175.178.75.67:27017/admin',
+  // secret: 'HWJ147258369hwj',
 }
