@@ -11,7 +11,7 @@ module.exports = {
     increment_var : 'PORT', // PM2 will see that i want to increment the PORT variable for each instance;The first instance will have process.env.PORT = 3000 and the second process.env.PORT = 3001
     // default environment
     env: {
-      "PORT": 3333, // 这里不能是 3000,因为源代码里面是使用的是 3000
+      "PORT": 3000  , // 这里不能是 3000,因为源代码里面是使用的是 3000
       "NODE_ENV": "development"
     },
     // to use env_production by using pm2 start ecosystem.config.js --env production.

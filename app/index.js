@@ -71,6 +71,6 @@ app.use(
 // 不仅仅是个中间件,可以在上下文中添加方法
 app.use(Parameter(app))
 routes(app)
-// app.listen(3000, () => {
-//   console.log('应用在 3000 端口启动成功...')
-// })
+app.listen(process.env.PORT || 3333, () => {
+  console.log(`应用在 ${process.env.PORT || 3333} 端口启动成功...`)
+})
