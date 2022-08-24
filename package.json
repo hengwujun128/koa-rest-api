@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/hengwujun128/koa-rest-api#readme",
   "dependencies": {
+    "fs-extra": "^10.1.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
     "koa-body": "^4.1.1",
@@ -30,6 +31,7 @@
     "koa-parameter": "^3.0.1",
     "koa-router": "^8.0.8",
     "koa-static": "^5.0.0",
+    "koa2-cors": "^2.0.6",
     "mongoose": "^5.9.10"
   },
   "devDependencies": {

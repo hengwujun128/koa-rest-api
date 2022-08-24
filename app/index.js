@@ -9,6 +9,7 @@ const routes = require('./routes')
 // const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')
 const Parameter = require('koa-parameter')
+const cors = require('koa2-cors')
 const path = require('path')
 
 // 静态资源
@@ -68,6 +69,24 @@ app.use(
     },
   })
 )
+
+app.use(
+  cors({
+    origin: function (ctx) {
+      if (ctx.url === '/test') {
+        return false
+      }
+      return '*'
+    },
+    maxAge: 120,
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'DELETE'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Accept', 'User-Client'],
+  })
+)
+
+// add cors
+
 // 不仅仅是个中间件,可以在上下文中添加方法
 app.use(Parameter(app))
 routes(app)
