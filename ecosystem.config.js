@@ -26,7 +26,7 @@ module.exports = {
   deploy: {
     development: {},
     production: {
-      key: '/Users/martin/.ssh/id_ed25519.pub', // path to the public key to authenticate
+      // key: '', // path to the public key to authenticate
       user: 'ubuntu',
       host: ['119.29.68.169'], // 可以发布到多台机器
       ref: 'origin/master',
