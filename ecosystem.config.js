@@ -31,6 +31,7 @@ module.exports = {
       host: ['119.29.68.169'], // 可以发布到多台机器
       ref: 'origin/master',
       repo: 'git@github.com:hengwujun128/koa-rest-api.git',
+
       path: '/home/ubuntu/www/api/koa-rest-api',
       // Deployment Lifecycle
       'pre-setup':
