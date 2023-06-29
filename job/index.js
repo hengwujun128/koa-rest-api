@@ -15,38 +15,7 @@ const path = require('path')
 const koaStatic = require('koa-static')
 const Error = require('koa-json-error')
 
-// const mongoose = require('mongoose')
-// const { connectionStr } = require('./config')
-// mongoose.connect(
-//   connectionStr,
-//   {
-//     connectTimeoutMS: 2000,
-//     useNewUrlParser: true,
-//     useFindAndModify: false,
-//     useUnifiedTopology: true,
-//   },
-//   () => {
-//     console.log('connect  mongoDb succeed')
-//   }
-// )
-// mongoose.connection.on('error', console.error)
-
 //任何中间件都需要用 use 方法,注册到 APP 之中
-
-/* 
-自定义捕捉错误的中间件:捕捉自定义错误,捕捉运行时错误
- */
-// app.use(async (context, next) => {
-//   try {
-//     // 先执行后面的中间件,在捕获里面的错误
-//     await next()
-//   } catch (err) {
-//     context.status = err.status || err.statusCode || 500
-//     context.body = {
-//       message: err.message,
-//     }
-//   }
-// })
 
 app.use(koaStatic(path.join(__dirname, 'public')))
 app.use(
