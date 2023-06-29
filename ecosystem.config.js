@@ -45,7 +45,7 @@ module.exports = {
       'post-setup':
         "echo 'commands or a script path to be run on the host after cloning the repo'",
       /* --------------------------------- deploy --------------------------------- */
-      'pre-deploy': 'execute pre-deploy hook ...',
+      'pre-deploy': 'echo pre-deploy hook ...',
       'post-deploy':
         'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-deploy-local': '',
