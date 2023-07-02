@@ -6,25 +6,30 @@ const fsExtra = require('fs-extra')
 const fs = require('fs')
 const path = require('path')
 
-// const UPLOAD_DIR = path.join(__dirname, 'public/uploads')
-const UPLOAD_DIR = path.resolve(__dirname, '..', 'public/uploads/chunks') // 注意： public  前面不能有/
+// const UPLOAD_CHUNKS_DIR = path.join(__dirname, 'public/uploads')
+const UPLOAD_CHUNKS_DIR = path.resolve(__dirname, '..', 'public/uploads/chunks') // 注意： public  前面不能有/
+const UPLOAD_FILES_DIR = path.resolve(__dirname, '..', 'public/uploads/files')
 
-const streamMergeRecursive = (scripts = [], fileWriteStream, fileHash) => {
-  // 递归到尾部情况判断
-  if (!scripts.length) {
-    fileWriteStream.end("console.log('Stream 合并完成')") // 最后关闭可写流，防止内存泄漏
-    // fs.rmdirSync(`${UPLOAD_DIR}/${fileHash}`)
+const streamMergeRecursive = (chunks = [], fileWriteStream, fileHash) => {
+  if (!chunks.length) {
+    fileWriteStream.end(() => {
+      console.log('Stream 合并完成')
+      fs.rmdirSync(`${UPLOAD_CHUNKS_DIR}/${fileHash}`)
+    })
+    // fs.rmdirSync(`${UPLOAD_CHUNKS_DIR}/${fileHash}`)
     return
   }
 
-  const currentFile = path.resolve(UPLOAD_DIR, fileHash + '/', scripts.shift())
-  // console.log('=====scripts====', scripts)
-  // console.log('=====currentFile====', currentFile)
+  const currentFile = path.resolve(
+    UPLOAD_CHUNKS_DIR,
+    fileHash + '/',
+    chunks.shift()
+  )
   const currentReadStream = fs.createReadStream(currentFile) // 获取当前的可读流
 
   currentReadStream.pipe(fileWriteStream, { end: false })
   currentReadStream.on('end', function () {
-    streamMergeRecursive(scripts, fileWriteStream, fileHash)
+    streamMergeRecursive(chunks, fileWriteStream, fileHash)
     // delete currentFile
     fs.unlinkSync(currentFile)
   })
@@ -34,20 +39,6 @@ const streamMergeRecursive = (scripts = [], fileWriteStream, fileHash) => {
     console.error(error)
     fileWriteStream.close()
   })
-}
-
-const deleteChunks = (url) => {
-  var files = []
-  if (fs.existsSync(url)) {
-    files = fs.readdirSync(url)
-    files.forEach(function (file, index) {
-      var curPath = path.join(url, file)
-      fs.unlinkSync(curPath)
-    })
-    fs.rmdirSync(url)
-  } else {
-    console.log('给定的路径不存在，请给出正确的路径')
-  }
 }
 
 class HomeCtrl {
@@ -73,8 +64,8 @@ class HomeCtrl {
 
     const { fileHash, chunkHash, chunk: A } = body
     const chunkIndex = chunkHash.split('-')[1]
-    const chunkDir = `${UPLOAD_DIR}/${fileHash}`
-    const chunkPath = `${UPLOAD_DIR}/${fileHash}/${chunkIndex}`
+    const chunkDir = `${UPLOAD_CHUNKS_DIR}/${fileHash}`
+    const chunkPath = `${UPLOAD_CHUNKS_DIR}/${fileHash}/${chunkIndex}`
 
     if (!fsExtra.existsSync(chunkDir)) {
       await fsExtra.mkdirs(chunkDir)
@@ -84,20 +75,30 @@ class HomeCtrl {
         overwrite: true,
       })
       .then(() => {
-        // console.log('move success', path.resolve(chunkDir, chunkIndex))
+        console.log('move success', path.resolve(chunkDir, chunkIndex))
+        context.body = {
+          status: 200,
+          message: `upload chunk ---${chunkIndex}--- successfully !`,
+        }
       })
-
-    context.body = {
-      status: 200,
-      message: 'upload chunks successfully !',
-    }
+      .catch((err) => {
+        context.body = {
+          status: 0,
+          message: 'upload chunks failure !',
+        }
+      })
+    // async function
+    // context.body = {
+    //   status: 200,
+    //   message: 'upload chunks successfully !',
+    // }
   }
 
   async mergeChunks1(context) {
     let counter = 0
     const body = context.request.body
     const { fileHash, fileName, chunkSize } = body
-    const chunkDir = path.resolve(UPLOAD_DIR, fileHash)
+    const chunkDir = path.resolve(UPLOAD_CHUNKS_DIR, fileHash)
     // 读取文件夹心所有分片
     const chunks = await fsExtra.readdir(chunkDir)
     const chunkNumber = chunks.length
@@ -105,7 +106,7 @@ class HomeCtrl {
     // sort chunks
     chunks.sort((a, b) => a - b)
     chunks.forEach((chunk, index) => {
-      const chunkPath = path.resolve(UPLOAD_DIR, fileHash, chunk)
+      const chunkPath = path.resolve(UPLOAD_CHUNKS_DIR, fileHash, chunk)
       // create writeable stream
       const writeableStream = fsExtra.createWriteStream(fileHash + fileName, {
         start: index * chunkSize,
@@ -127,7 +128,10 @@ class HomeCtrl {
             fileHash + fileName
           )
           // uploadedFilePath 有问题
-          fsExtra.move(uploadedFilePath, UPLOAD_DIR + '/' + fileHash + fileName)
+          fsExtra.move(
+            uploadedFilePath,
+            UPLOAD_CHUNKS_DIR + '/' + fileHash + fileName
+          )
         }
       })
       readStream.pipe(writeableStream)
@@ -146,14 +150,17 @@ class HomeCtrl {
   mergeChunks(context) {
     const body = context.request.body
     const { fileHash, fileName, chunkSize } = body
-    const sourceFiles = `${UPLOAD_DIR}/${fileHash}`
-    const targetFile = `${UPLOAD_DIR}/${fileHash}${fileName}`
+    const sourceFiles = `${UPLOAD_CHUNKS_DIR}/${fileHash}`
+    const targetFile = `${UPLOAD_FILES_DIR}/${fileHash}-${fileName}`
 
     // const scripts = fs.readdirSync(path.resolve(__dirname, sourceFiles)) // 获取源文件目录下的所有文件
     const chunks = fs.readdirSync(sourceFiles)
-    const fileWriteStream = fs.createWriteStream(targetFile)
     chunks.sort((a, b) => a - b)
+
+    const fileWriteStream = fs.createWriteStream(targetFile)
+
     streamMergeRecursive(chunks, fileWriteStream, fileHash)
+    // todo：
     context.body = {
       status: 200,
       message: 'merge successfully!',
