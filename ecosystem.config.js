@@ -24,7 +24,20 @@ module.exports = {
     },
     {
       name: 'myJob',
-      script: 'index.js',
+      script: 'job/index.js',
+      watch: 'true', // Restart on file change
+      ignore_watch: ['node_modules'],
+      instances: 1,
+      increment_var: 'PORT', // PM2 will see that i want to increment the PORT variable for each instance;The first instance will have process.env.PORT = 3000 and the second process.env.PORT = 3001
+      env: {
+        PORT: 3100,
+        NODE_ENV: 'development',
+      },
+      // NOTE: to use env_production by using pm2 start ecosystem.config.js --env production.
+      env_production: {
+        PORT: 4100,
+        NODE_ENV: 'production',
+      },
     },
   ],
   // Deployment Configuration
