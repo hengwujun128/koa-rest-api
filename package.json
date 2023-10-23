@@ -4,7 +4,7 @@
   "description": "a rest api project",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env PORT=3000 nodemon app/index.js",
+    "start": "cross-env PORT=3000 nodemon  app/index.js ",
     "startAll": "pm2 start ecosystem.config.js",
     "production": "cross-env NODE_ENV=production node app",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -32,7 +32,9 @@
     "koa-router": "^8.0.8",
     "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
-    "mongoose": "^5.9.10"
+    "mongoose": "^5.9.10",
+    "node-fetch": "2",
+    "unsplash-js": "^7.0.18"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
