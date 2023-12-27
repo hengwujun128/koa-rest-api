@@ -49,7 +49,9 @@ const Error = require('koa-json-error')
 //   }
 // })
 
+
 app.use(koaStatic(path.join(__dirname, 'public')))
+
 app.use(
   Error({
     // e,原生的错误信息,使用解构语法解构中间件的 参数对象,提取stack,和剩余参数
@@ -62,9 +64,9 @@ app.use(
 // app.use(bodyParser())
 app.use(
   koaBody({
-    multipart: true,
-    formidable: {
-      uploadDir: path.join(__dirname, '/public/uploads'),
+    multipart: true, //  Parse multipart bodies, default false
+    formidable: { // Options to pass to the formidable multipart parser
+      uploadDir: path.join(__dirname, '/public/uploads'), //Sets the directory for placing file uploads in
       keepExtensions: true, // 保留扩展名
     },
   })

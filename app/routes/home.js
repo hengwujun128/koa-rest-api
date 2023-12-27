@@ -1,5 +1,8 @@
 const Router = require('koa-router')
-const router = new Router()
+const router = new Router({
+  prefix:'/home'
+})
+
 
 const {
   index,
@@ -7,6 +10,7 @@ const {
   uploadChunk,
   mergeChunks,
 } = require('../controllers/home')
+
 router.get('/', index)
 router.post('/upload', upload)
 router.post('/uploadChunk', uploadChunk)

@@ -56,13 +56,16 @@ class HomeCtrl {
 
   // uploadChunk
   async uploadChunk(context) {
-    const chunk = context.request.files.chunk
-    // console.log('====files:', context.request.files)
-    // get fileHash and chuckHash
+    const chunk = context.request.files.chunk  // chunk 为客户端字段,二进制需要从context.request.files获取
+    // '/Users/martin/Documents/Github/koa-rest-api.git/app/public/uploads/upload_58d21292947b5d03c8b04309197c7dca'
+    // console.log('====files:', context.request.files) 
     const body = context.request.body
     // console.log('====body:', context.request.body)
 
     const { fileHash, chunkHash, chunk: A } = body
+    // console.log('====A:', A) undefined
+
+
     const chunkIndex = chunkHash.split('-')[1]
     const chunkDir = `${UPLOAD_CHUNKS_DIR}/${fileHash}`
     const chunkPath = `${UPLOAD_CHUNKS_DIR}/${fileHash}/${chunkIndex}`
