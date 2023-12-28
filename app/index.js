@@ -53,6 +53,7 @@ const Error = require('koa-json-error')
 app.use(koaStatic(path.join(__dirname, 'public')))
 
 app.use(
+
   Error({
     // e,原生的错误信息,使用解构语法解构中间件的 参数对象,提取stack,和剩余参数
     postFormat: (e, { stack, ...rest }) => {
