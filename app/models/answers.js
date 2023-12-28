@@ -31,7 +31,7 @@ const answerSchema = new Schema(
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 // 导出的 model 也是个类
 module.exports = model('Answer', answerSchema)

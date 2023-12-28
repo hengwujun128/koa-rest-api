@@ -34,10 +34,7 @@ class UsersCtl {
         return f
       })
       .join(' ')
-    const user = await usersModel
-      .findById(context.params.id)
-      .select(selectFields)
-      .populate(populateStr)
+    const user = await usersModel.findById(context.params.id).select(selectFields).populate(populateStr)
     if (!user) context.throw(404, '用户不存在')
     context.body = user
   }
@@ -72,10 +69,7 @@ class UsersCtl {
       educations: { type: 'array', itemType: 'object', required: false },
     })
     // console.log(context.request.body)
-    const user = await usersModel.findByIdAndUpdate(
-      context.params.id,
-      context.request.body
-    )
+    const user = await usersModel.findByIdAndUpdate(context.params.id, context.request.body)
     //id 判断
     if (!user) {
       context.throw(404, '用户不存在')
@@ -118,10 +112,7 @@ class UsersCtl {
     2.populate() 返回的也是数组,但是元素是个用户对象 
    */
   async listFollowing(context) {
-    const user = await usersModel
-      .findById(context.params.id)
-      .select('+following')
-      .populate('following')
+    const user = await usersModel.findById(context.params.id).select('+following').populate('following')
     if (!user) {
       context.throw(404)
     } else {
@@ -142,9 +133,7 @@ class UsersCtl {
   关注某人
    */
   async follow(context) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+following')
+    const me = await usersModel.findById(context.state.user._id).select('+following')
     // following 是 mongo 自带的数据类型,这里需要批量转成字符串
 
     if (!me.following.map((id) => id.toString()).includes(context.params.id)) {
@@ -158,13 +147,9 @@ class UsersCtl {
   取消关注
    */
   async unfollow(context) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+following')
+    const me = await usersModel.findById(context.state.user._id).select('+following')
     // 获取 要取消用户的索引
-    const index = me.following
-      .map((id) => id.toString())
-      .indexOf(context.params.id)
+    const index = me.following.map((id) => id.toString()).indexOf(context.params.id)
     if (index > -1) {
       me.following.splice(index, 1)
       me.save() // 注意:取消关注之后还要保存到数据库
@@ -177,14 +162,10 @@ class UsersCtl {
   关注 Topic
    */
   async followTopic(context) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+followingTopics')
+    const me = await usersModel.findById(context.state.user._id).select('+followingTopics')
     // following 是 mongo 自带的数据类型,这里需要批量转成字符串
 
-    if (
-      !me.followingTopics.map((id) => id.toString()).includes(context.params.id)
-    ) {
+    if (!me.followingTopics.map((id) => id.toString()).includes(context.params.id)) {
       me.followingTopics.push(context.params.id)
       me.save() // 注意:添加关注之后还要保存到数据库
     }
@@ -195,13 +176,9 @@ class UsersCtl {
   取消关注 Topic
    */
   async unfollowTopic(context) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+followingTopics')
+    const me = await usersModel.findById(context.state.user._id).select('+followingTopics')
     // 获取 要取消用户的索引
-    const index = me.followingTopics
-      .map((id) => id.toString())
-      .indexOf(context.params.id)
+    const index = me.followingTopics.map((id) => id.toString()).indexOf(context.params.id)
     if (index > -1) {
       me.followingTopics.splice(index, 1)
       me.save() // 注意:取消关注之后还要保存到数据库
@@ -212,10 +189,7 @@ class UsersCtl {
   获取用户关注的 topics
    */
   async listFollowingTopics(context) {
-    const user = await usersModel
-      .findById(context.params.id)
-      .select('+followingTopics')
-      .populate('followingTopics')
+    const user = await usersModel.findById(context.params.id).select('+followingTopics').populate('followingTopics')
     if (!user) {
       context.throw(404, '用户不存在')
     } else {
@@ -229,14 +203,10 @@ class UsersCtl {
    * 用户点赞:点赞之后还要修改答案的投票数
    */
   async likeAnswer(context, next) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+likingAnswers')
+    const me = await usersModel.findById(context.state.user._id).select('+likingAnswers')
     // following 是 mongo 自带的数据类型,这里需要批量转成字符串
     // 判断用户点赞属性列表中是否有某个答案,没有就 push 进去
-    if (
-      !me.likingAnswers.map((id) => id.toString()).includes(context.params.id)
-    ) {
+    if (!me.likingAnswers.map((id) => id.toString()).includes(context.params.id)) {
       me.likingAnswers.push(context.params.id)
       me.save() // 注意:添加点赞 之后还要保存到数据库
       // 修改答案的投票数+1,mongoose 中为某个属性值+-1,increment
@@ -252,13 +222,9 @@ class UsersCtl {
    * 用户取消点赞:首先也是获取用户的点赞列表
    */
   async unLikeAnswer(context) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+likingAnswers')
+    const me = await usersModel.findById(context.state.user._id).select('+likingAnswers')
     // 获取 要取消用户的索引
-    const index = me.likingAnswers
-      .map((id) => id.toString())
-      .indexOf(context.params.id)
+    const index = me.likingAnswers.map((id) => id.toString()).indexOf(context.params.id)
 
     if (index > -1) {
       me.likingAnswers.splice(index, 1)
@@ -274,10 +240,7 @@ class UsersCtl {
    * 获取用户点赞列表:因为是引用,想拿到具体信息,所以需要 populate一下
    */
   async listLinkingAnswers(context) {
-    const user = await usersModel
-      .findById(context.params.id)
-      .select('+likingAnswers')
-      .populate('likingAnswers')
+    const user = await usersModel.findById(context.params.id).select('+likingAnswers').populate('likingAnswers')
     if (!user) {
       context.throw(404, '用户不存在')
     } else {
@@ -292,16 +255,10 @@ class UsersCtl {
    * 用户踩:
    */
   async disLikeAnswer(context, next) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+disLikingAnswers')
+    const me = await usersModel.findById(context.state.user._id).select('+disLikingAnswers')
     // following 是 mongo 自带的数据类型,这里需要批量转成字符串
     // 判断用户点赞属性列表中是否有某个答案,没有就 push 进去
-    if (
-      !me.disLikingAnswers
-        .map((id) => id.toString())
-        .includes(context.params.id)
-    ) {
+    if (!me.disLikingAnswers.map((id) => id.toString()).includes(context.params.id)) {
       me.disLikingAnswers.push(context.params.id)
       me.save() // 注意:添加点赞 之后还要保存到数据库
     }
@@ -313,13 +270,9 @@ class UsersCtl {
    * 用户取消点踩:首先也是获取用户的踩列表
    */
   async unDisLikeAnswer(context) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+disLikingAnswers')
+    const me = await usersModel.findById(context.state.user._id).select('+disLikingAnswers')
     // 获取 要取消用户的索引
-    const index = me.disLikingAnswers
-      .map((id) => id.toString())
-      .indexOf(context.params.id)
+    const index = me.disLikingAnswers.map((id) => id.toString()).indexOf(context.params.id)
 
     if (index > -1) {
       me.disLikingAnswers.splice(index, 1)
@@ -331,10 +284,7 @@ class UsersCtl {
    * 获取用户踩列表:因为是引用,想拿到具体信息,所以需要 populate一下
    */
   async listDisLinkingAnswers(context) {
-    const user = await usersModel
-      .findById(context.params.id)
-      .select('+disLikingAnswers')
-      .populate('disLikingAnswers')
+    const user = await usersModel.findById(context.params.id).select('+disLikingAnswers').populate('disLikingAnswers')
     if (!user) {
       context.throw(404, '用户不存在')
     } else {
@@ -349,16 +299,10 @@ class UsersCtl {
    * router.put('/collectingAnswers/:id', Auth2, checkAnswerExist, collectAnswer)
    */
   async collectAnswer(context, next) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+collectingAnswers')
+    const me = await usersModel.findById(context.state.user._id).select('+collectingAnswers')
     // following 是 mongo 自带的数据类型,这里需要批量转成字符串
     // 判断用户点赞属性列表中是否有某个答案,没有就 push 进去
-    if (
-      !me.collectingAnswers
-        .map((id) => id.toString())
-        .includes(context.params.id)
-    ) {
+    if (!me.collectingAnswers.map((id) => id.toString()).includes(context.params.id)) {
       me.collectingAnswers.push(context.params.id)
       me.save()
     }
@@ -371,13 +315,9 @@ class UsersCtl {
    router.delete('/collectingAnswers/:id',Auth2,checkAnswerExist,unCollectAnswer)
    */
   async unCollectAnswer(context) {
-    const me = await usersModel
-      .findById(context.state.user._id)
-      .select('+collectingAnswers')
+    const me = await usersModel.findById(context.state.user._id).select('+collectingAnswers')
     // 获取 要取消用户的索引
-    const index = me.collectingAnswers
-      .map((id) => id.toString())
-      .indexOf(context.params.id)
+    const index = me.collectingAnswers.map((id) => id.toString()).indexOf(context.params.id)
 
     if (index > -1) {
       me.collectingAnswers.splice(index, 1)
@@ -391,10 +331,7 @@ class UsersCtl {
    * router.get('/:id/collectingAnswers', listDisLinkingAnswers)
    */
   async listCollectingAnswers(context) {
-    const user = await usersModel
-      .findById(context.params.id)
-      .select('+collectingAnswers')
-      .populate('collectingAnswers')
+    const user = await usersModel.findById(context.params.id).select('+collectingAnswers').populate('collectingAnswers')
     if (!user) {
       context.throw(404, '用户不存在')
     } else {

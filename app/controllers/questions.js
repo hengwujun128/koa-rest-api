@@ -9,9 +9,7 @@ class QuestionsCtl {
     const startOffset = (currentPage - 1) * pageSize
     // 搜索 title 或者 description
     const q = new RegExp(context.query.q)
-    context.body = await QuestionModel.find({ title: q, description: q })
-      .limit(pageSize)
-      .skip(startOffset)
+    context.body = await QuestionModel.find({ title: q, description: q }).limit(pageSize).skip(startOffset)
   }
   /* question 详情:因为使用了引用,所以需要 populate() */
   async findById(context) {
@@ -22,9 +20,7 @@ class QuestionsCtl {
       .map((f) => '+' + f)
       .join(' ')
 
-    const Question = await QuestionModel.findById(context.params.id)
-      .select(selectFields)
-      .populate('questioner topics')
+    const Question = await QuestionModel.findById(context.params.id).select(selectFields).populate('questioner topics')
     context.body = Question
   }
   /* create question */
@@ -39,10 +35,11 @@ class QuestionsCtl {
     }).save()
     context.body = Question
   }
+
   /* update question 
-   1. 这里有个优化点:更新时候使用了 findById 查询了 modal
-   2. update 依赖上个中间件 findById,可以使用中间件中结果进行判断,不需要 findByIdAndUpdate()
-   3. 问题的更新 只用提出问题的人才能更新
+  1. 这里有个优化点:更新时候使用了 findById 查询了 modal
+  2. update 依赖上个中间件 findById,可以使用中间件中结果进行判断,不需要 findByIdAndUpdate()
+  3. 问题的更新 只用提出问题的人才能更新
   */
   async update(context) {
     context.verifyParams({
@@ -76,9 +73,7 @@ class QuestionsCtl {
    */
   async checkQuestionExist(context, next) {
     // 要把提问题加上
-    const question = await QuestionModel.findById(context.params.id).select(
-      '+questioner'
-    )
+    const question = await QuestionModel.findById(context.params.id).select('+questioner')
     if (!question) {
       context.throw(404, '问题不存在')
     }

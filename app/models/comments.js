@@ -41,7 +41,7 @@ const commentSchema = new Schema(
       select: false, // 列表中不想出现该字段
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 // 导出的 model 也是个类
 module.exports = model('Comment', commentSchema)

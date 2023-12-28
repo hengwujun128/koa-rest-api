@@ -79,7 +79,7 @@ const user = new Schema(
       select: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 // 导出的 model 也是个类
 module.exports = model('usersModel', user)

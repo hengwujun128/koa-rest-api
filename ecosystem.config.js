@@ -53,14 +53,11 @@ module.exports = {
       path: '/home/ubuntu/www/api/koa-rest-api',
       // Deployment Lifecycle
       /* ---------------------------------- setup --------------------------------- */
-      'pre-setup':
-        "echo 'commands or local script path to be run on the host before the setup process starts'",
-      'post-setup':
-        "echo 'commands or a script path to be run on the host after cloning the repo'",
+      'pre-setup': "echo 'commands or local script path to be run on the host before the setup process starts'",
+      'post-setup': "echo 'commands or a script path to be run on the host after cloning the repo'",
       /* --------------------------------- deploy --------------------------------- */
       'pre-deploy': 'echo pre-deploy hook ...',
-      'post-deploy':
-        'npm install && pm2 reload ecosystem.config.js --env production',
+      'post-deploy': 'npm install && pm2 reload ecosystem.config.js --env production',
       'pre-deploy-local': '',
     },
   },

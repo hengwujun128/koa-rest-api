@@ -34,10 +34,7 @@ class CommentsCtl {
       .map((f) => '+' + f)
       .join(' ')
     //这里写死了commentator ,只引用评论者相关信息
-    const Comment = await commentModel
-      .findById(context.params.id)
-      .select(selectFields)
-      .populate('commentator')
+    const Comment = await commentModel.findById(context.params.id).select(selectFields).populate('commentator')
     context.body = Comment
   }
   /* create Comment:
@@ -102,23 +99,15 @@ class CommentsCtl {
    */
   async checkCommentExist(context, next) {
     // 要把提答案加上
-    const Comment = await commentModel
-      .findById(context.params.id)
-      .select('+commentator')
+    const Comment = await commentModel.findById(context.params.id).select('+commentator')
     if (!Comment) {
       context.throw(404, '评论不存在')
     }
     // context.params.questionId: 参数中有 questionId ,即只有在删,改,查答案才进行判断,赞和踩不检查
-    if (
-      context.params.questionId &&
-      Comment.questionId.toString() !== context.params.questionId
-    ) {
+    if (context.params.questionId && Comment.questionId.toString() !== context.params.questionId) {
       context.throw(404, '该问题下没有此评论')
     }
-    if (
-      context.params.answerId &&
-      Comment.answerId.toString() !== context.params.answerId
-    ) {
+    if (context.params.answerId && Comment.answerId.toString() !== context.params.answerId) {
       context.throw(404, '该答案下没有此评论')
     }
     context.state.Comment = Comment // 存入 Comment 到 state

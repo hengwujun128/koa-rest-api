@@ -95,13 +95,10 @@ class FileController {
           let uploadedFilePath = path.resolve(
             // __dirname,
             // '..',
-            fileHash + fileName
+            fileHash + fileName,
           )
           // uploadedFilePath 有问题
-          fsExtra.move(
-            uploadedFilePath,
-            UPLOAD_CHUNKS_DIR + '/' + fileHash + fileName
-          )
+          fsExtra.move(uploadedFilePath, UPLOAD_CHUNKS_DIR + '/' + fileHash + fileName)
         }
       })
       readStream.pipe(writeableStream)

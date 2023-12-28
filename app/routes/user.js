@@ -89,13 +89,7 @@ router.get('/:id/questions', listQuestions) // 某个用户的粉丝列表
 
 /* 用户赞,取消赞,赞列表 */
 /* 赞踩互斥:点赞就取消踩,点踩就取消赞 ,likeAnswer 之前需要unDisLikeAnswer 先执行,因此是个likeAnswer是个中间件*/
-router.put(
-  '/linkAnswers/:id',
-  Auth2,
-  checkAnswerExist,
-  likeAnswer,
-  unDisLikeAnswer
-)
+router.put('/linkAnswers/:id', Auth2, checkAnswerExist, likeAnswer, unDisLikeAnswer)
 router.delete('/linkAnswers/:id', Auth2, checkAnswerExist, unLikeAnswer)
 router.get('/:id/linkAnswers', listLinkingAnswers)
 
@@ -105,18 +99,13 @@ router.put(
   Auth2,
   checkAnswerExist,
   disLikeAnswer,
-  unLikeAnswer
+  unLikeAnswer,
 ) /* 赞踩互斥:点赞就取消踩,点擦就取消赞 */
 router.delete('/dislinkAnswers/:id', Auth2, checkAnswerExist, unDisLikeAnswer)
 router.get('/:id/dislinkAnswers', listDisLinkingAnswers)
 /* 用户收藏和取消搜藏答案 */
 router.put('/collectingAnswers/:id', Auth2, checkAnswerExist, collectAnswer)
-router.delete(
-  '/collectingAnswers/:id',
-  Auth2,
-  checkAnswerExist,
-  unCollectAnswer
-)
+router.delete('/collectingAnswers/:id', Auth2, checkAnswerExist, unCollectAnswer)
 router.get('/:id/collectingAnswers', listDisLinkingAnswers)
 
 module.exports = router

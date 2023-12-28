@@ -17,7 +17,7 @@ const topic = new Schema(
     avatar_url: { type: String },
     introduction: { type: String, select: false },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 // 导出的 model 也是个类
 module.exports = model('Topic', topic)

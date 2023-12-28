@@ -23,10 +23,7 @@ class AnswersCtl {
       .map((f) => '+' + f)
       .join(' ')
 
-    const Answer = await answerModal
-      .findById(context.params.id)
-      .select(selectFields)
-      .populate('answerer')
+    const Answer = await answerModal.findById(context.params.id).select(selectFields).populate('answerer')
     context.body = Answer
   }
   /* create Answer:
@@ -81,17 +78,12 @@ class AnswersCtl {
    */
   async checkAnswerExist(context, next) {
     // 要把提答案加上
-    const Answer = await answerModal
-      .findById(context.params.id)
-      .select('+Answerer')
+    const Answer = await answerModal.findById(context.params.id).select('+Answerer')
     if (!Answer) {
       context.throw(404, '答案不存在')
     }
     // context.params.questionId: 参数中有 questionId ,即只有在删,改,查答案才进行判断,赞和踩不检查
-    if (
-      context.params.questionId &&
-      Answer.questionId !== context.params.questionId
-    ) {
+    if (context.params.questionId && Answer.questionId !== context.params.questionId) {
       context.throw(404, '该问题下没有此答案')
     }
     context.state.Answer = Answer // 存入 Answer 到 state

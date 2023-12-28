@@ -21,9 +21,7 @@ class TopicsCtl {
       .map((f) => '+' + f)
       .join(' ')
 
-    const topic = await topicModel
-      .findById(context.params.id)
-      .select(selectFields)
+    const topic = await topicModel.findById(context.params.id).select(selectFields)
     context.body = topic
   }
 
@@ -49,10 +47,7 @@ class TopicsCtl {
       introduction: { type: 'string', required: false },
     })
     // 注意这是更新前的 topic,如果想返回更新后的 topic 可以合并一下
-    const topic = await topicModel.findByIdAndUpdate(
-      context.params.id,
-      context.request.body
-    )
+    const topic = await topicModel.findByIdAndUpdate(context.params.id, context.request.body)
     context.body = topic
   }
   /* 

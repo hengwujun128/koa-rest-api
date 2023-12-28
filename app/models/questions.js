@@ -25,7 +25,7 @@ const questionSchema = new Schema(
       select: false, // 不期望在列表中显示 topics 信息,动态选择
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 )
 // 导出的 model 也是个类
 module.exports = model('Question', questionSchema)
